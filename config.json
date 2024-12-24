@@ -1,0 +1,13 @@
+{
+    "platformName": "Android",
+    "deviceName": "OnePlus Nord 2T",
+    "udid": "CYINPR4PIV6PJNKF",
+    "appPackage": "com.firebird.artist360.uat",
+    "appActivity": "com.firebird.artist360.MainActivity",
+    "automationName": "UiAutomator2",
+    "ignoreHiddenApiPolicyError": true,
+    "noReset": true,
+    "serverUrl": "http://127.0.0.1:4723/wd/hub",
+    "email": "test+random@gmail.com",
+    "password": "a1b2c3D4"
+}

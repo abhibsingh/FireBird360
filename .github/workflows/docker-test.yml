@@ -1,0 +1,41 @@
+name: Build and Test Automation
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout the code
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Set up Python
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.9
+
+      # Build the Docker image
+      - name: Build Docker Image
+        run: |
+          docker build -t android-test-runner .
+
+      # Run Tests
+      - name: Run Tests
+        run: |
+          docker run --rm -it \
+          -p 4723:4723 \
+          -v "$(pwd)/tests:/tests" \
+          android-test-runner bash -c "
+          emulator @test_avd -no-audio -no-window &
+          sleep 20 &&
+          pytest /tests --maxfail=1 --disable-warnings
+          "
