@@ -36,7 +36,7 @@ jobs:
           -p 4723:4723 \
           -v "$(pwd)/tests:/app/tests" \
           android-test-runner bash -c "
-          emulator @test_avd -no-audio -no-window &
+          emulator @test_avd -no-audio -no-window -accel off &
           sleep 20 &&
           pytest /app/tests --maxfail=1 --disable-warnings
           "
