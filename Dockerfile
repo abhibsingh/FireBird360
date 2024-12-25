@@ -11,8 +11,12 @@ RUN apt-get update && apt-get install -y \
     ln -fs /usr/share/zoneinfo/$TZ /etc/localtime && \
     dpkg-reconfigure -f noninteractive tzdata
 
-# Upgrade pip to the latest version
-RUN pip3 install --upgrade pip
+# Upgrade pip and install Python dependencies
+RUN pip3 install --upgrade pip setuptools wheel && \
+    pip3 install \
+    appium-python-client==4.4.0 \
+    pytest==7.4.0 \
+    selenium==4.12.0
 
 # Set environment variables for Android SDK
 ENV ANDROID_HOME=/opt/android-sdk
@@ -32,13 +36,6 @@ RUN yes | sdkmanager --licenses && \
     "platforms;android-30" \
     "system-images;android-30;google_apis;x86_64" \
     "emulator"
-
-# Install specific versions of Python dependencies
-RUN pip3 install --upgrade pip setuptools wheel && \
-    pip3 install \
-    appium-python-client==2.11.6 \
-    pytest==7.4.0 \
-    selenium==4.12.0
 
 # Create and configure Android Virtual Device (AVD)
 RUN echo "no" | avdmanager create avd -n test_avd -k "system-images;android-30;google_apis;x86_64" --device "pixel_2"
