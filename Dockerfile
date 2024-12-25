@@ -23,16 +23,23 @@ RUN yes | $ANDROID_HOME/cmdline-tools/bin/sdkmanager --licenses && \
     "system-images;android-30;google_apis;x86_64" \
     "emulator"
 
-# Set up AVD
-RUN echo "no" | $ANDROID_HOME/cmdline-tools/bin/sdkmanager --install "system-images;android-30;google_apis;x86_64" && \
-    $ANDROID_HOME/emulator/emulator -avd test_avd -no-window -no-audio &
-
-# Install Appium and Python dependencies
+# Install Python and dependencies
 RUN apt-get install -y python3 python3-pip && \
     pip3 install appium pytest selenium
+# Set timezone environment variable to avoid manual prompt
+ENV DEBIAN_FRONTEND=noninteractive
+ENV TZ=Asia/Kolkata
 
-# Expose default Appium port
+# Install tzdata without prompts
+RUN apt-get update && \
+    apt-get install -y tzdata && \
+    ln -fs /usr/share/zoneinfo/$TZ /etc/localtime && \
+    dpkg-reconfigure -f noninteractive tzdata
+
+
+
+# Expose Appium port
 EXPOSE 4723
 
-# Start the Appium server by default
+# Default command to start Appium server
 CMD ["appium"]
