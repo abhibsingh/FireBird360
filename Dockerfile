@@ -12,11 +12,9 @@ RUN apt-get update && apt-get install -y \
     dpkg-reconfigure -f noninteractive tzdata
 
 # Upgrade pip and install Python dependencies
-RUN pip3 install --upgrade pip setuptools wheel && \
-    pip3 install \
-    appium-python-client==4.4.0 \
-    pytest==7.4.0 \
-    selenium==4.12.0
+RUN python3 -m pip install --upgrade pip setuptools wheel
+RUN python3 -m pip install appium-python-client==4.4.0 pytest==7.4.0 selenium==4.12.0 || \
+    echo "Retrying installation..." && python3 -m pip install appium-python-client pytest selenium
 
 # Set environment variables for Android SDK
 ENV ANDROID_HOME=/opt/android-sdk
