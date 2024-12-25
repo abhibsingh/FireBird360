@@ -28,14 +28,14 @@ def driver():
     # Configuration for Appium
     desired_capabilities = {
     "platformName": "Android",
-    "appium:deviceName": "emulator-5554",
-    "appium:udid": "emulator-5554",
-    "appium:appPackage": "com.firebird.artist360.uat",
-    "appium:appActivity": "com.firebird.artist360.MainActivity",
-    "appium:automationName": "UiAutomator2",
-    "appium:ignoreHiddenApiPolicyError": True,
-    "appium:noReset": True,
-    "appium:unicodeKeyboard": True,
+    "deviceName": "test_avd",  # Matches the AVD created in the Dockerfile
+    "automationName": "UiAutomator2",
+    "appPackage": "com.firebird.artist360.uat",
+    "appActivity": "com.firebird.artist360.MainActivity",
+    "noReset": True,
+
+   
+    "unicodeKeyboard": True,
 }
 
    

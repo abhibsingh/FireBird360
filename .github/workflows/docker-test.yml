@@ -18,18 +18,12 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # Step 2: Set up Python
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: 3.9
-
-      # Step 3: Build the Docker image
+      # Step 2: Build Docker image
       - name: Build Docker Image
         run: |
           docker build -t android-test-runner .
 
-      # Step 4: Run tests in Docker container
+      # Step 3: Run the Docker container
       - name: Run Tests
         run: |
           docker run --rm -it \
