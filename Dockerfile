@@ -8,7 +8,7 @@ RUN apt-get update && \
 # Download and install Appium (with detailed logging)
 # ... other instructions
 
-RUN wget https://github.com/appium/appium-desktop/releases/download/v1.22.3-4/appium-desktop-setup-1.22.3-4.exe && \ 
+RUN wget https://github.com/appium/appium-desktop/releases/download/v1.22.3-4/appium-desktop.zip && \
     unzip appium-desktop.zip && \
     mv appium-desktop /opt/appium && \
     rm appium-desktop.zip
