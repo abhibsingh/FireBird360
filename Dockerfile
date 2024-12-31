@@ -2,22 +2,15 @@ FROM openjdk:11-jdk
 
 # Install dependencies
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends wget unzip && \
+    apt-get install -y --no-install-recommends wget unzip npm && \
     rm -rf /var/lib/apt/lists/*
 
-# Download and install Appium (with detailed logging)
-# ... other instructions
+# Install Appium using npm (specify the exact version)
+RUN npm install -g appium@1.22.3-4
 
-RUN wget https://github.com/appium/appium-desktop/releases/download/v1.22.3-4/Appium-Server-GUI-windows-1.22.3-4.zip && \
-    unzip appium-desktop.zip && \
-    mv appium-desktop /opt/appium && \
-    rm appium-desktop.zip
-
-# ... rest of your Dockerfile
-
-# Set up environment variables
-ENV APPIUM_HOME /opt/appium
-ENV PATH $APPIUM_HOME/resources/app/node_modules/.bin:$PATH
+# Set up environment variables (adjust if needed)
+ENV APPIUM_HOME /usr/local/lib/node_modules/appium 
+ENV PATH $APPIUM_HOME/node_modules/.bin:$PATH
 
 # Install Python and required packages
 RUN apt-get update && \
