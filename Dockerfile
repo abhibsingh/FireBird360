@@ -1,51 +1,53 @@
-# Use an Ubuntu base image
-FROM ubuntu:20.04
+FROM openjdk:11-jdk
 
-# Set environment variables to avoid interactive prompts
-ENV DEBIAN_FRONTEND=noninteractive
-ENV TZ=Asia/Kolkata
+# Install dependencies
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends wget unzip && \
+    rm -rf /var/lib/apt/lists/*
 
-# Update and install required tools
-RUN apt-get update && apt-get install -y \
-    openjdk-11-jdk wget unzip curl git python3 python3-pip tzdata && \
-    ln -fs /usr/share/zoneinfo/$TZ /etc/localtime && \
-    dpkg-reconfigure -f noninteractive tzdata
+# Download and install Appium
+RUN wget -q https://github.com/appium/appium-desktop/releases/latest/download/appium-desktop.zip && \
+    unzip appium-desktop.zip && \
+    mv appium-desktop /opt/appium && \
+    rm appium-desktop.zip
 
-# Upgrade pip and install Python dependencies
-RUN python3 -m pip install --upgrade pip setuptools wheel
-RUN python3 -m pip install appium-python-client==4.4.0 pytest==7.4.0 selenium==4.12.0 || \
-    echo "Retrying installation..." && python3 -m pip install appium-python-client pytest selenium
+# Set up environment variables
+ENV APPIUM_HOME /opt/appium
+ENV PATH $APPIUM_HOME/resources/app/node_modules/.bin:$PATH
 
-# Set environment variables for Android SDK
-ENV ANDROID_HOME=/opt/android-sdk
-ENV PATH=$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$ANDROID_HOME/emulator:$PATH
+# Install Python and required packages
+RUN apt-get update && \
+    apt-get install -y python3 python3-pip && \
+    pip3 install Appium-Python-Client pytest
 
-# Install Android SDK Command Line Tools
-RUN mkdir -p $ANDROID_HOME/cmdline-tools && \
-    wget -q https://dl.google.com/android/repository/commandlinetools-linux-8512546_latest.zip -O sdk-tools.zip && \
-    unzip sdk-tools.zip -d $ANDROID_HOME/cmdline-tools && \
-    rm sdk-tools.zip && \
-    mv $ANDROID_HOME/cmdline-tools/cmdline-tools $ANDROID_HOME/cmdline-tools/latest
+# Download and set up Android SDK
+RUN wget -q https://dl.google.com/android/repository/commandlinetools-linux-8512546_latest.zip && \
+    unzip commandlinetools-linux-8512546_latest.zip -d android-cmdline-tools && \
+    rm commandlinetools-linux-8512546_latest.zip && \
+    mv android-cmdline-tools/cmdline-tools android-sdk && \
+    mv android-sdk /opt/android-sdk
 
-# Accept Android SDK licenses and install required packages
-RUN yes | sdkmanager --licenses && \
-    sdkmanager --install \
-    "platform-tools" \
-    "platforms;android-30" \
-    "system-images;android-30;google_apis;x86_64" \
-    "emulator"
+ENV ANDROID_HOME /opt/android-sdk
+ENV PATH $ANDROID_HOME/tools:$ANDROID_HOME/tools/bin:$ANDROID_HOME/platform-tools:$PATH
 
-# Create and configure Android Virtual Device (AVD)
-RUN echo "no" | avdmanager create avd -n test_avd -k "system-images;android-30;google_apis;x86_64" --device "pixel_2"
+# Accept Android licenses (important!)
+RUN yes | sdkmanager --licenses
 
-# Expose necessary ports
+# Install necessary SDK components
+RUN sdkmanager "platform-tools" "platforms;android-33" "build-tools;33.0.2" "emulator" "system-images;android-33;google_apis;x86_64"
+
+# Create and start the Android emulator
+RUN avdmanager create avd -n test_avd -k "system-images;android-33;google_apis;x86_64" -f
+RUN emulator -avd test_avd -no-window -no-audio &
+
+# Expose Appium port
 EXPOSE 4723
 
 # Set working directory
 WORKDIR /app
 
-# Copy the test files to the container
-COPY . /app
+# Copy the test code into the container
+COPY . .
 
-# Default command to start Appium server
-CMD ["appium"]
+# Run the tests
+CMD ["pytest", "-v"]
