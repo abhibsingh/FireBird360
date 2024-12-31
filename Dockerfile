@@ -5,8 +5,8 @@ RUN apt-get update && \
     apt-get install -y --no-install-recommends wget unzip && \
     rm -rf /var/lib/apt/lists/*
 
-# Download and install Appium
-RUN wget -q https://github.com/appium/appium-desktop/releases/latest/download/appium-desktop.zip && \
+# Download and install Appium (with detailed logging)
+RUN wget  https://github.com/appium/appium-desktop/releases/latest/download/appium-desktop.zip && \ 
     unzip appium-desktop.zip && \
     mv appium-desktop /opt/appium && \
     rm appium-desktop.zip
@@ -36,9 +36,9 @@ RUN yes | sdkmanager --licenses
 # Install necessary SDK components
 RUN sdkmanager "platform-tools" "platforms;android-33" "build-tools;33.0.2" "emulator" "system-images;android-33;google_apis;x86_64"
 
-# Create and start the Android emulator
+# Create and start the Android emulator (with & disown to keep it running in background)
 RUN avdmanager create avd -n test_avd -k "system-images;android-33;google_apis;x86_64" -f
-RUN emulator -avd test_avd -no-window -no-audio &
+RUN nohup emulator -avd test_avd -no-window -no-audio & disown
 
 # Expose Appium port
 EXPOSE 4723
