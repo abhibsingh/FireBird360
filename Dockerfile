@@ -6,10 +6,14 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 # Download and install Appium (with detailed logging)
-RUN wget  https://github.com/appium/appium-desktop/releases/latest/download/appium-desktop.zip && \ 
+# ... other instructions
+
+RUN wget https://github.com/appium/appium-desktop/releases/download/v1.22.3-4/appium-desktop-setup-1.22.3-4.exe && \ 
     unzip appium-desktop.zip && \
     mv appium-desktop /opt/appium && \
     rm appium-desktop.zip
+
+# ... rest of your Dockerfile
 
 # Set up environment variables
 ENV APPIUM_HOME /opt/appium
